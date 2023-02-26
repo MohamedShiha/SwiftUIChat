@@ -27,13 +27,14 @@ struct Message: Identifiable, Codable {
      
      - Returns: A chat room with an empty
      */
-    init(id: String, body: MessageType, sender: User) {
+	init(id: String = UUID().uuidString, body: MessageType, sender: User) {
         self.id = id
         self.body = body
         self.sender = sender
         self.createAt = Int(Date().timeIntervalSince1970)
     }
     
+	/// Keys for encoding and decoding data.
     enum CodingKeys: String, CodingKey {
         case id = "id"
         case body = "body"
