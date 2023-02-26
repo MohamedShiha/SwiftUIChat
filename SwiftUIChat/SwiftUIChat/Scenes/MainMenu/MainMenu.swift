@@ -10,27 +10,37 @@ import SwiftUI
 struct MainMenu: View {
     
     @StateObject var chatroomViewModel = ChatRoomViewModel(manager: ChatRoomManager())
-    private let roomDurationInMinutes = 30
+	/// A hardcoded duration for a chat room in minutes
+    private let DURATION = 30
     @State private var opensChat = false
     
-    var body: some View {
-        Button {
-            Task {
-                await chatroomViewModel.start(forDuration: roomDurationInMinutes)
-                withAnimation {
-                    opensChat = true
-                }
-            }
-        } label: {
-            Text("Start chatting 💬")
-                .font(.system(size: 22, weight: .semibold))
-                .padding()
-                .foregroundColor(.white)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.main)
-                )
-        }
+	var body: some View {
+		ZStack {
+			Button {
+				Task {
+					// Create a chat room
+					await chatroomViewModel.start(forDuration: DURATION)
+					withAnimation {
+						opensChat = true
+					}
+				}
+			} label: {
+				Text("Start chatting 💬")
+					.font(.system(size: 22, weight: .semibold))
+					.padding()
+					.foregroundColor(.white)
+					.background(
+						RoundedRectangle(cornerRadius: 10)
+							.fill(Color.main)
+					)
+			}
+			
+			// Navigate to conversation scene.
+			if opensChat {
+				NavigationLink(destination: ConversationView(viewModel: ConversationViewModel(roomId: chatroomViewModel.chatroom!.id, MessageProvider())),
+							   isActive: $opensChat) { EmptyView() }
+			}
+		}
     }
 }
 
