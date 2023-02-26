@@ -17,6 +17,7 @@ struct ChatRoom: Identifiable, Codable {
     /// timestamp from the creation date to the givem Date in seconds
     let ttl: Int
     
+	/// Keys for encoding and decoding data.
     enum Codingkeys: String, CodingKey {
         case id = "id"
         case thread = "thread"
@@ -52,13 +53,6 @@ struct ChatRoom: Identifiable, Codable {
         self.thread = thread
         self.createdAt = Int(Date().timeIntervalSince1970)
         self.ttl = ttl
-    }
-    
-    enum CodingKeys: CodingKey {
-        case id
-        case thread
-        case createdAt
-        case ttl
     }
 }
 
