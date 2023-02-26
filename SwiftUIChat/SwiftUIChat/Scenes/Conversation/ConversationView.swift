@@ -7,46 +7,33 @@
 
 import SwiftUI
 
-struct DummyMessage: Identifiable {
-    let id = UUID().uuidString
-    let text: String
-    let time: String
-    let forwardType: ForwardType
-}
-
 struct ConversationView: View {
-    
-    @State private var text = ""
+	
     @FocusState private var isGoingToType: Bool
-    @State var messageList: [DummyMessage] = [
-        DummyMessage(text: "Hi Morsy, how you?", time: "1:12", forwardType: .sender),
-        DummyMessage(text: "Thank you for your order!", time: "1:12", forwardType: .sender),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .reciever),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .sender),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .reciever),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .sender),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .reciever),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .sender),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .reciever),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .reciever),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .sender),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .reciever),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .sender),
-        DummyMessage(text: "Meow", time: "1:12", forwardType: .reciever)
-    ]
-    
-    
+	@StateObject private var viewModel: ConversationViewModel
+	
+	init(viewModel: ConversationViewModel) {
+		self._viewModel = StateObject(wrappedValue: viewModel)
+	}
+	
     @ViewBuilder
     var conversationList: some View {
-        if !messageList.isEmpty {
+		if !viewModel.thread.isEmpty {
             ScrollViewReader { proxy in
                 ScrollView {
-                    ForEach(messageList) {
-                        TextMessage(text: $0.text, forwardType: $0.forwardType, time: $0.time, mainColor: .main)
-                            .id($0.id)
+					ForEach(viewModel.thread) { message in
+						switch message.body {
+						case .text(let text):
+							TextMessage(text: text,
+										forwardType: message.sender.id == currentUser.id ? .sender : .reciever,
+										time: Date(timeIntervalSince1970: TimeInterval(message.createAt)).timeFormatted(),
+										mainColor: .main)
+						default:
+							EmptyView()
+						}
                     }
                     .padding(.vertical)
-                    .onChange(of: messageList.count) { _ in
+                    .onChange(of: viewModel.thread.count) { _ in
                         self.scrollToBottom(scrollProxy: proxy)
                     }
                     .onChange(of: isGoingToType) { newValue in
@@ -54,13 +41,15 @@ struct ConversationView: View {
                             self.scrollToBottom(scrollProxy: proxy)
                         }
                     }
-                    .onAppear {
-                        self.scrollToBottom(scrollProxy: proxy)
-                    }
+					.onAppear {
+						self.scrollToBottom(scrollProxy: proxy)
+					}
                 }
             }
+			.navigationBarHidden(true)
         } else {
             emptyConversationView
+				.navigationBarHidden(true)
         }
     }
     
@@ -79,9 +68,11 @@ struct ConversationView: View {
                 print("Back")
             }
             conversationList
-            MessageToolBar(text: $text, actionColor: .main, onSend: {
+			MessageToolBar(text: $viewModel.text, actionColor: .main, onSend: {
                 print("Send")
-                sendDummyMessage()
+				Task {
+					await viewModel.sendTextMessage()
+				}
             })
             .focused($isGoingToType, equals: true)
         }
@@ -94,21 +85,8 @@ struct ConversationView: View {
     func scrollToBottom(scrollProxy: ScrollViewProxy) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             withAnimation(.easeInOut) {
-                scrollProxy.scrollTo(messageList.last?.id, anchor: UnitPoint(x: 1, y: 0.95))
+				scrollProxy.scrollTo(viewModel.thread.last?.id, anchor: UnitPoint(x: 1, y: 0.95))
             }
         }
-    }
-    
-    func sendDummyMessage() {
-        guard !text.isEmpty else { return }
-        let random = (0...1).randomElement() ?? 0
-        messageList.append(DummyMessage(text: text, time: "10:16", forwardType: random == 0 ? .sender : .reciever))
-        text = ""
-    }
-}
-
-struct ConversationView_Previews: PreviewProvider {
-    static var previews: some View {
-        ConversationView()
     }
 }
