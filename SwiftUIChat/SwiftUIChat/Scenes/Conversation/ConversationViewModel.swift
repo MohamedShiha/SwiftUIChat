@@ -7,16 +7,45 @@
 
 import Foundation
 
-final class ConversationViewModel: ObservableObject {
+@MainActor final class ConversationViewModel: ObservableObject {
     
-    private let manager: any Provider
-    @Published var thread = Array<Message>()
+    private let manager: any MessageProvidable
+	private let roomId: String
+	@Published var thread = Array<Message>()
+	@Published var text = ""
     
-    init(_ manager: some Provider) {
+	init(roomId: String, _ manager: some MessageProvidable) {
+		self.roomId = roomId
         self.manager = manager
+		Task {
+			await listenToMessages()
+		}
     }
-    
-    func sendMessage(_ message: Message, to roomId: String) async {
-        await manager.send(<#T##value: Provider.T##Provider.T#>, to: <#T##String#>)
+	
+	deinit {
+		stopListeningToMessages()
+	}
+	
+	func sendTextMessage() async {
+		guard !text.isEmpty else { return }
+		let message = Message(body: .text(text), sender: currentUser)
+		do {
+			try await manager.send(message, to: roomId)
+			DispatchQueue.main.async {
+				self.text = ""
+			} 
+		} catch {
+			print(error.localizedDescription)
+		}
     }
+	
+	func listenToMessages() async {
+		for await message in manager.listen(from: roomId) {
+			thread.append(message)
+		}
+	}
+	
+	nonisolated func stopListeningToMessages() {
+		manager.stopListening()
+	}
 }
