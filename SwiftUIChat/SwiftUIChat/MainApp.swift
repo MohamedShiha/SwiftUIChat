@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+let currentUser = User(id: "32B2C22D-C680-482C-B3AB-3DB4D04BA096", name: "Mohamed Shiha", avatar: nil)
+
 @main
 struct SwiftUIChatApp: App {
     
