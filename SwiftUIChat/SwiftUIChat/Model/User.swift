@@ -30,6 +30,7 @@ struct User: Identifiable, Codable {
         self.avatar = avatar
     }
     
+	/// Keys for encoding and decoding data.
     enum CodingKeys: String, CodingKey {
         case id = "id"
         case name = "name"
