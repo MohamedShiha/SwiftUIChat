@@ -30,7 +30,7 @@ struct MessageToolBar: View {
         .background(
             Color.white
                 .shadow(color: .black.opacity(0.1), radius: 16)
-                .edgesIgnoringSafeArea(.bottom)
+                .edgesIgnoringSafeArea(.all)
         )
     }
 }
