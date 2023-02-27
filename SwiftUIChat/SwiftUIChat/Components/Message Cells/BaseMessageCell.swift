@@ -54,7 +54,7 @@ struct BaseMessageCell<Content: View>: View {
         Text(time)
             .font(.system(size: 14))
             .foregroundColor(Color(uiColor: .secondaryLabel))
-            .transition(.scale)
+            .transition(.opacity)
             .padding(.horizontal, 24)
     }
     
