@@ -18,7 +18,7 @@ import Foundation
 		self.roomId = roomId
         self.manager = manager
 		Task {
-			await listenToMessages()
+			thread = await manager.fetch(from: roomId)
 		}
     }
 	
@@ -28,7 +28,7 @@ import Foundation
 	
 	func sendTextMessage() async {
 		guard !text.isEmpty else { return }
-		let message = Message(body: .text(text), sender: currentUser)
+		let message = Message(body: .text(text), sender: CURRENT_USER)
 		do {
 			try await manager.send(message, to: roomId)
 			self.text = ""
@@ -37,9 +37,18 @@ import Foundation
 		}
     }
 	
-	func listenToMessages() async {
+	func startListening() async {
+		// Remove the last element as it is later added again when the listener works.
+		if !thread.isEmpty {
+			thread.removeLast()
+		}
+		await listenToMessages()
+	}
+	
+	private func listenToMessages() async {
 		for await message in manager.listen(from: roomId) {
 			thread.append(message)
+			text = ""
 		}
 	}
 	

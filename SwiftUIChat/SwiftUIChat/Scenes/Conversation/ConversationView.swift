@@ -25,7 +25,7 @@ struct ConversationView: View {
 						switch message.body {
 						case .text(let text):
 							TextMessage(text: text,
-										forwardType: message.sender.id == currentUser.id ? .sender : .reciever,
+										forwardType: message.sender.id == CURRENT_USER.id ? .sender : .reciever,
 										time: Date(timeIntervalSince1970: TimeInterval(message.createAt)).timeFormatted(),
 										mainColor: .main)
 						default:
@@ -68,8 +68,15 @@ struct ConversationView: View {
                 print("Back")
             }
             conversationList
+				.onAppear {
+					Task {
+						await viewModel.startListening()
+					}
+				}
+				.onDisappear {
+					viewModel.stopListeningToMessages()
+				}
 			MessageToolBar(text: $viewModel.text, actionColor: .main, onSend: {
-                print("Send")
 				Task {
 					await viewModel.sendTextMessage()
 				}
