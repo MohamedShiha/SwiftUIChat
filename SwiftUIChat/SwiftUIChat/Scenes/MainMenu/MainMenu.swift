@@ -10,8 +10,6 @@ import SwiftUI
 struct MainMenu: View {
     
     @StateObject var chatroomViewModel = ChatRoomViewModel(manager: ChatRoomManager())
-	/// A hardcoded duration for a chat room in minutes
-    private let DURATION = 30
     @State private var opensChat = false
     
 	var body: some View {
@@ -19,7 +17,7 @@ struct MainMenu: View {
 			Button {
 				Task {
 					// Create a chat room
-					await chatroomViewModel.start(forDuration: DURATION)
+					await chatroomViewModel.initiate()
 					withAnimation {
 						opensChat = true
 					}
