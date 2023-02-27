@@ -7,15 +7,79 @@
 
 import SwiftUI
 
+/// Multiline SwiftUI TextView with a placeholder
+struct TextView: View {
+
+	@Binding var text: String
+	@Binding var height: Double
+	let placeholder: String
+	let padding: EdgeInsets
+	let foregroundColor: UIColor
+	let backgroundColor: UIColor
+	let cursorColor: UIColor
+	let onTextChange: ((String) -> Void)?
+	let onChangeBegin: (() -> Void)?
+	let onChangeEnd: (() -> Void)?
+	
+	@FocusState private var isFocused: Bool
+	
+	init(_ text: Binding<String>,
+		 height: Binding<Double>,
+		 placeholder: String,
+		 padding: EdgeInsets = .init(top: 4, leading: 12, bottom: 4, trailing: 12),
+		 foregroundColor: UIColor = .label,
+		 backgroundColor: UIColor = .systemBackground,
+		 cursorColor: UIColor = .tintColor,
+		 onTextChange: ((String) -> Void)? = nil,
+		 onChangeBegin: (() -> Void)? = nil,
+		 onChangeEnd: (() -> Void)? = nil) {
+		
+		self._text = text
+		self._height = height
+		self.placeholder = placeholder
+		self.padding = padding
+		self.foregroundColor = foregroundColor
+		self.backgroundColor = backgroundColor
+		self.cursorColor = cursorColor
+		self.onTextChange = onTextChange
+		self.onChangeBegin = onChangeBegin
+		self.onChangeEnd = onChangeEnd
+	}
+	
+	var body: some View {
+		ZStack(alignment: .leading) {
+			TextViewPresentation($text,
+								 height: $height,
+								 padding: padding,
+								 foregroundColor: foregroundColor,
+								 backgroundColor: backgroundColor,
+								 cursorColor: cursorColor,
+								 onTextChange: onTextChange,
+								 onChangeBegin: onChangeBegin,
+								 onChangeEnd: onChangeEnd)
+			.focused($isFocused, equals: true)
+			if text.isEmpty {
+				Text(placeholder)
+					.font(.system(size: 17))
+					.foregroundColor(Color(uiColor: .placeholderText))
+					.padding(.leading, padding.leading + 5)
+					.offset(y: 2)
+					.onTapGesture {
+						isFocused = true
+					}
+			}
+		}
+	}
+}
+
 /// Multiline SwiftUI TextView
-struct TextView: UIViewRepresentable {
+struct TextViewPresentation: UIViewRepresentable {
     
     typealias UIViewType = UITextView
     
     @Binding var text: String
     @Binding var height: Double
     let padding: UIEdgeInsets
-    let placeholder: String
     let foregroundColor: UIColor
     let backgroundColor: UIColor
     let cursorColor: UIColor
@@ -28,7 +92,6 @@ struct TextView: UIViewRepresentable {
      
      - Parameter text: text within the textview.
      - Parameter height: container height.
-     - Parameter placeholder: a text that appears in case of empty text.
      - Parameter padding: text container padding.
      - Parameter foregroundColor: text color.
      - Parameter cursorColor: editing cursor color..
@@ -41,8 +104,7 @@ struct TextView: UIViewRepresentable {
      */
     init(_ text: Binding<String>,
          height: Binding<Double>,
-         placeholder: String,
-         padding: EdgeInsets = .init(top: 4, leading: 12, bottom: 4, trailing: 12),
+         padding: EdgeInsets,
          foregroundColor: UIColor = .label,
          backgroundColor: UIColor = .systemBackground,
          cursorColor: UIColor = .tintColor,
@@ -53,7 +115,6 @@ struct TextView: UIViewRepresentable {
         self._text = text
         self._height = height
         self.padding = UIEdgeInsets(top: padding.top, left: padding.leading, bottom: padding.bottom, right: padding.trailing)
-        self.placeholder = placeholder
         self.foregroundColor = foregroundColor
         self.backgroundColor = backgroundColor
         self.cursorColor = cursorColor
@@ -64,9 +125,8 @@ struct TextView: UIViewRepresentable {
     
     func makeUIView(context: Context) -> UITextView {
         let textView = UITextView()
-        textView.text = placeholder
         textView.contentInset = padding
-        textView.textColor = .placeholderText
+        textView.textColor = .label
         textView.backgroundColor = backgroundColor
         textView.font = .systemFont(ofSize: 17)
         textView.showsVerticalScrollIndicator = false
@@ -93,7 +153,6 @@ struct TextView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(text: $text,
                     height: $height,
-                    placeholder: placeholder,
                     foregroundColor: foregroundColor,
                     onTextChange: onTextChange,
                     onChangeBegin: onChangeBegin,
@@ -105,13 +164,11 @@ struct TextView: UIViewRepresentable {
         
         @Binding var text: String
         @Binding var height: Double
-        let placeholder: String
         let foregroundColor: UIColor
         let onTextChange: ((String) -> Void)?
         let onChangeBegin: (() -> Void)?
         let onChangeEnd: (() -> Void)?
 
-        private let placeholderColor = UIColor.placeholderText
         private var minHeight: CGFloat = 40
         private var maxHeight: CGFloat = 88
         
@@ -120,7 +177,6 @@ struct TextView: UIViewRepresentable {
          
          - Parameter text: text within the textview.
          - Parameter height: container height.
-         - Parameter placeholder: a text that appears in case of empty text.
          - Parameter foregroundColor: text color.
          - Parameter onTextChange: completion handler that fires everytime the text is changed.
          - Parameter onChangeBegin: completion handler that fires everytime the editing begins.
@@ -130,14 +186,12 @@ struct TextView: UIViewRepresentable {
          */
         init(text: Binding<String>,
              height: Binding<Double>,
-             placeholder: String,
              foregroundColor: UIColor,
              onTextChange: ((String) -> Void)? = nil,
              onChangeBegin: (() -> Void)? = nil,
              onChangeEnd: (() -> Void)? = nil) {
             self._text = text
             self._height = height
-            self.placeholder = placeholder
             self.foregroundColor = foregroundColor
             self.onTextChange = onTextChange
             self.onChangeBegin = onChangeBegin
@@ -162,18 +216,10 @@ struct TextView: UIViewRepresentable {
         }
         
         func textViewDidBeginEditing(_ textView: UITextView) {
-            if textView.text == placeholder || textView.textColor == placeholderColor {
-                textView.text = ""
-                textView.textColor = foregroundColor
-            }
             onChangeBegin?()
         }
         
         func textViewDidEndEditing(_ textView: UITextView) {
-            if textView.text.isEmpty {
-                textView.text = placeholder
-                textView.textColor = placeholderColor
-            }
             onChangeEnd?()
         }
     }
