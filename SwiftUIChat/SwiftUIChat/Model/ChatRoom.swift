@@ -46,7 +46,7 @@ struct ChatRoom: Identifiable, Codable {
      - Parameter thread: A list of messages between the sender and reciever.
      - Parameter ttl: **time-to-live** in seconds = DueDate - Now.
      
-     - Returns: A chat room with an empty
+     - Returns: A chat room
      */
     init(thread: Array<Message> = [], ttl: Int) {
         self.id = UUID().uuidString
