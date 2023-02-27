@@ -20,6 +20,14 @@ final class ChatRoomManager: ChatRoomManaging {
 	/// A hardcoded duration for a chat room in minutes
 	private let DURATION = 30
 	
+	/**
+	 Initiates an object based on its presence/existence in Firestore
+	 
+	 If there is an id saved in UserDefaults,
+	 a chat room could be still alive in the remote server
+	 The room will exist based on its ttl or time-to-live then it is fetched.
+	 If there is NO id saved in UserDefaults then, a new room will be created.
+	 */
 	func initiate() async -> ChatRoom? {
 		if let id = ChatRoom.fetchId() {
 			guard let room = await get(managedId: id) else {
