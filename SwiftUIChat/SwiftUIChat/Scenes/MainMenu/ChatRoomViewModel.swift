@@ -9,21 +9,21 @@ import Foundation
 
 @MainActor final class ChatRoomViewModel: ObservableObject {
     
-    private let manager: any ChatRoomManagable
+    private let manager: any ChatRoomManaging
 	@Published var chatroom: ChatRoom? = nil
     
-    init(manager: some ChatRoomManagable) {
+    init(manager: some ChatRoomManaging) {
         self.manager = manager
     }
     
-    /// Start a chat room for a specific duration in **minutes**.
-    func start(forDuration duration: Int) async { 
-		let room = await manager.create(for: duration)
+    /// Initiate a chat room
+    func initiate() async {
+		let room = await manager.initiate()
         if let room {
             print(room.description)
 			self.chatroom = room
         } else {
-            print("Error Creating Room in Firestore.")
+            fatalError("Error Creating Room in Firestore.")
         }
     }
     
@@ -31,6 +31,11 @@ import Foundation
 		guard let chatroom else {
 			return false
 		}
-		return await manager.delete(managed: chatroom)
+		do {
+			try await manager.delete(managed: chatroom)
+			return true
+		} catch {
+			return false
+		}
     }
 }
