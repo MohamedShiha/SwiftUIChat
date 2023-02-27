@@ -9,12 +9,12 @@ import Foundation
 
 @MainActor final class ConversationViewModel: ObservableObject {
     
-    private let manager: any MessageProvidable
+    private let manager: any MessageProviding
 	private let roomId: String
 	@Published var thread = Array<Message>()
 	@Published var text = ""
     
-	init(roomId: String, _ manager: some MessageProvidable) {
+	init(roomId: String, _ manager: some MessageProviding) {
 		self.roomId = roomId
         self.manager = manager
 		Task {
@@ -31,9 +31,7 @@ import Foundation
 		let message = Message(body: .text(text), sender: currentUser)
 		do {
 			try await manager.send(message, to: roomId)
-			DispatchQueue.main.async {
-				self.text = ""
-			} 
+			self.text = ""
 		} catch {
 			print(error.localizedDescription)
 		}
