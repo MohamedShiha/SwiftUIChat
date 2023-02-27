@@ -30,6 +30,15 @@ protocol Providing {
 	 */
 	func listen(from sourceId: String) -> AsyncStream<T>
 	
+	/**
+	 Fetches latest data from the provider
+	 
+	 - Parameter sourceId: The id of the destination source
+	 
+	 - Returns: An array of the retrieved objects.
+	 */
+	func fetch(from sourceId: String) async -> Array<T>
+	
 	/// Stop listening for any incoming data.
 	func stopListening()
 }

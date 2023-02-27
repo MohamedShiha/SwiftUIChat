@@ -50,6 +50,13 @@ class MessageProvider: MessageProviding {
 		}
     }
 	
+	func fetch(from sourceId: String) async -> Array<Message> {
+		guard let room = try? await roomsCollection.document(sourceId).getDocument(as: ChatRoom.self) else {
+			return Array<Message>()
+		}
+		return room.thread
+	}
+	
 	func stopListening() {
 		listener?.remove()
 		listener = nil
