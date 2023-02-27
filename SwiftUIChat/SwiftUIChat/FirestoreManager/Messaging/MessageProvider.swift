@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-class MessageProvider: MessageProvidable {
+class MessageProvider: MessageProviding {
     
     typealias T = Message
 	var listener: ListenerRegistration?
