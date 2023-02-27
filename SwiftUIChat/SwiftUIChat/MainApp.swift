@@ -24,5 +24,5 @@ struct SwiftUIChatApp: App {
 }
 
 extension Color {
-    static let main = Color(red: 43 / 255, green: 41 / 255, blue: 121 / 255)
+	static let main = Color.accentColor
 }
