@@ -138,6 +138,10 @@ struct TextViewPresentation: UIViewRepresentable {
     
     func updateUIView(_ uiView: UITextView, context: Context) {
         
+		if text.isEmpty {
+			uiView.text = text
+		}
+		
         uiView.bounds.size = CGSize(width: uiView.bounds.size.width, height: height)
         if height > 50 {
             UIView.animate(withDuration: 0.2) {
