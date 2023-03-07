@@ -11,6 +11,7 @@ struct ConversationView: View {
 	
     @FocusState private var isGoingToType: Bool
 	@StateObject private var viewModel: ConversationViewModel
+	@Environment(\.dismiss) var dismiss
 	
 	init(viewModel: ConversationViewModel) {
 		self._viewModel = StateObject(wrappedValue: viewModel)
@@ -19,33 +20,21 @@ struct ConversationView: View {
     @ViewBuilder
     var conversationList: some View {
 		if !viewModel.thread.isEmpty {
-            ScrollViewReader { proxy in
-                ScrollView {
-					ForEach(viewModel.thread) { message in
-						switch message.body {
-						case .text(let text):
-							TextMessage(text: text,
-										forwardType: message.sender.id == CURRENT_USER.id ? .sender : .reciever,
-										time: Date(timeIntervalSince1970: TimeInterval(message.createAt)).timeFormatted(),
-										mainColor: .main)
-						default:
-							EmptyView()
-						}
-                    }
-                    .padding(.vertical)
-                    .onChange(of: viewModel.thread.count) { _ in
-                        self.scrollToBottom(scrollProxy: proxy)
-                    }
-                    .onChange(of: isGoingToType) { newValue in
-                        if newValue {
-                            self.scrollToBottom(scrollProxy: proxy)
-                        }
-                    }
-					.onAppear {
-						self.scrollToBottom(scrollProxy: proxy)
+			ScrollView {
+				ForEach(viewModel.thread) { message in
+					switch message.body {
+					case .text(let text):
+						TextMessage(text: text,
+									forwardType: message.sender.id == CURRENT_USER.id ? .sender : .reciever,
+									time: Date(timeIntervalSince1970: TimeInterval(message.createAt)).timeFormatted(),
+									mainColor: .main)
+						.id(message.id)
+					default:
+						EmptyView()
 					}
-                }
-            }
+				}
+				.padding(.vertical)
+			}
 			.navigationBarHidden(true)
         } else {
             emptyConversationView
@@ -67,33 +56,55 @@ struct ConversationView: View {
             ConversationHeaderView(avatar: Image("avatar"), name: "Morsy Soker", accentColor: .main) {
                 print("Back")
             }
-            conversationList
-				.onAppear {
-					Task {
-						await viewModel.startListening()
+			ScrollViewReader { proxy in
+				conversationList
+					.onChange(of: viewModel.thread.count) { _ in
+						self.scrollToBottom(scrollProxy: proxy)
 					}
-				}
-				.onDisappear {
-					viewModel.stopListeningToMessages()
-				}
-			MessageToolBar(text: $viewModel.text, actionColor: .main, onSend: {
-				Task {
-					await viewModel.sendTextMessage()
-				}
-            })
-            .focused($isGoingToType, equals: true)
+					.onChange(of: isGoingToType) { newValue in
+						if newValue {
+							self.scrollToBottom(scrollProxy: proxy)
+						}
+					}
+					.onAppear {
+						self.scrollToBottom(scrollProxy: proxy)
+					}
+				MessageToolBar(text: $viewModel.text, actionColor: .main, onSend: {
+					Task {
+						await viewModel.sendTextMessage()
+						self.scrollToBottom(scrollProxy: proxy)
+					}
+				})
+				.focused($isGoingToType, equals: true)
+			}
         }
+		.onAppear {
+			Task {
+				do {
+					try await viewModel.startListening()
+				} catch {
+					dismiss()
+				}
+			}
+		}
+		.onDisappear {
+			viewModel.stopListeningToMessages()
+		}
         .onTapGesture {
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            isGoingToType = false
+			dismissKeyboard()
         }
     }
     
-    func scrollToBottom(scrollProxy: ScrollViewProxy) {
+    private func scrollToBottom(scrollProxy: ScrollViewProxy) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             withAnimation(.easeInOut) {
 				scrollProxy.scrollTo(viewModel.thread.last?.id, anchor: UnitPoint(x: 1, y: 0.95))
             }
         }
     }
+	
+	private func dismissKeyboard() {
+		UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+		isGoingToType = false
+	}
 }
