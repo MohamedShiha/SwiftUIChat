@@ -6,9 +6,6 @@
 
 ## User settings
 xcuserdata/
-*.xcuserstate
-project.xcworkspace/
-xcuserdata/
 
 ## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
 *.xcscmblueprint
@@ -59,7 +56,7 @@ Pods/
 Podfile.lock
 
 # Add this line if you want to avoid checking in source code from the Xcode workspace
-# *.xcworkspace
+*.xcworkspace
 
 # Carthage
 #
