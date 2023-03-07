@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		531F138929B712E5008A6A14 /* ProviderError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531F138829B712E5008A6A14 /* ProviderError.swift */; };
 		5333617F29AB476400A6FB5B /* Identifiable+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333617E29AB476400A6FB5B /* Identifiable+Extensions.swift */; };
 		5341263529AC375D000399B5 /* Joinable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5341263429AC375D000399B5 /* Joinable.swift */; };
 		5341263B29AC3946000399B5 /* JoinRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5341263A29AC3946000399B5 /* JoinRoomView.swift */; };
@@ -70,6 +71,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		531F138829B712E5008A6A14 /* ProviderError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderError.swift; sourceTree = "<group>"; };
 		5333617E29AB476400A6FB5B /* Identifiable+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Identifiable+Extensions.swift"; sourceTree = "<group>"; };
 		5341263429AC375D000399B5 /* Joinable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joinable.swift; sourceTree = "<group>"; };
 		5341263A29AC3946000399B5 /* JoinRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinRoomView.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 			children = (
 				A21B348D29815C6900841218 /* MessageProvider.swift */,
 				53C1FECF29A62F1300919148 /* Providing.swift */,
+				531F138829B712E5008A6A14 /* ProviderError.swift */,
 			);
 			path = Messaging;
 			sourceTree = "<group>";
@@ -465,6 +468,7 @@
 				5341264129AC3A97000399B5 /* ChatRoomReciever.swift in Sources */,
 				A21B348B2981568A00841218 /* User.swift in Sources */,
 				53C1FED029A62F1400919148 /* Providing.swift in Sources */,
+				531F138929B712E5008A6A14 /* ProviderError.swift in Sources */,
 				A2341B73297D40D4008C9944 /* ForwardType.swift in Sources */,
 				A21B3490298170C200841218 /* ChatRoomManager.swift in Sources */,
 				A21B34982981790900841218 /* MainMenu.swift in Sources */,
