@@ -28,7 +28,7 @@ protocol Providing {
 	 
 	 - Returns: A stream of the retrieved objects.
 	 */
-	func listen(from sourceId: String) -> AsyncStream<T>
+	func listen(from sourceId: String) -> AsyncThrowingStream<T, Error>
 	
 	/**
 	 Fetches latest data from the provider
