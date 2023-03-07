@@ -27,6 +27,7 @@ import Foundation
 	}
 	
 	func sendTextMessage() async {
+		let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
 		guard !text.isEmpty else { return }
 		let message = Message(body: .text(text), sender: CURRENT_USER)
 		do {
@@ -37,16 +38,16 @@ import Foundation
 		}
     }
 	
-	func startListening() async {
+	func startListening() async throws {
 		// Remove the last element as it is later added again when the listener works.
 		if !thread.isEmpty {
 			thread.removeLast()
 		}
-		await listenToMessages()
+		try await listenToMessages()
 	}
 	
-	private func listenToMessages() async {
-		for await message in manager.listen(from: roomId) {
+	private func listenToMessages() async throws {
+		for try await message in manager.listen(from: roomId) {
 			thread.append(message)
 			text = ""
 		}
