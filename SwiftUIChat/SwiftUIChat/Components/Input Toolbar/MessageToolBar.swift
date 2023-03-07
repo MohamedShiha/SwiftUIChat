@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MessageToolBar: View {
     
-    @State private var height: Double = 40
+    @State private var height: Double = 44
     @Binding var text: String
     let actionColor: Color
     let onSend: () -> Void
@@ -20,6 +20,7 @@ struct MessageToolBar: View {
                 .frame(height: height)
             Button {
                 onSend()
+				height = 44
             } label: {
                 Image(systemName: "paperplane.fill")
                     .font(.system(size: 20))
