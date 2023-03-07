@@ -26,7 +26,7 @@ struct TextView: View {
 	init(_ text: Binding<String>,
 		 height: Binding<Double>,
 		 placeholder: String,
-		 padding: EdgeInsets = .init(top: 4, leading: 12, bottom: 4, trailing: 12),
+		 padding: EdgeInsets = .init(top: 5, leading: 12, bottom: 5, trailing: 12),
 		 foregroundColor: UIColor = .label,
 		 backgroundColor: UIColor = .systemBackground,
 		 cursorColor: UIColor = .tintColor,
@@ -63,7 +63,7 @@ struct TextView: View {
 					.font(.system(size: 17))
 					.foregroundColor(Color(uiColor: .placeholderText))
 					.padding(.leading, padding.leading + 5)
-					.offset(y: 2)
+					.offset(y: -1)
 					.onTapGesture {
 						isFocused = true
 					}
@@ -173,7 +173,7 @@ struct TextViewPresentation: UIViewRepresentable {
         let onChangeBegin: (() -> Void)?
         let onChangeEnd: (() -> Void)?
 
-        private var minHeight: CGFloat = 40
+        private var minHeight: CGFloat = 44
         private var maxHeight: CGFloat = 88
         
         /**
@@ -208,7 +208,7 @@ struct TextViewPresentation: UIViewRepresentable {
             height = minHeight
             
             if textView.contentSize.height <= minHeight {
-                height = minHeight
+                height = minHeight + 2
             } else if textView.contentSize.height >= maxHeight {
                 height = maxHeight
             } else {
