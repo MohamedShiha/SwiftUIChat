@@ -25,15 +25,18 @@ class MessageProvider: MessageProviding {
         try await ref.updateData(fields)
     }
 	
-	func listen(from roomId: String) -> AsyncStream<Message> {
-		return AsyncStream(Message.self) { continuation in
+	func listen(from roomId: String) -> AsyncThrowingStream<Message, Error> {
+		return AsyncThrowingStream { continuation in
 			self.listener = roomsCollection.document(roomId).addSnapshotListener { snapshot, error in
 				guard error == nil else {
 					print(error!.localizedDescription)
 					return
 				}
 				
-				guard let snapshot, snapshot.exists else { return }
+				guard let snapshot, snapshot.exists else {
+					continuation.finish(throwing: ProviderError.sourceNotFound)
+					return
+				}
 				
 				do {
 					let room = try snapshot.data(as: ChatRoom.self)
